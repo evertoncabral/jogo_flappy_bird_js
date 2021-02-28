@@ -45,5 +45,40 @@ function parDeBarreiras(altura, abertura, posicao) {
   this.setPosicao(posicao);
 }
 
-const b = new parDeBarreiras(700, 200, 800);
-document.querySelector("[tp-flappy]").appendChild(b.elemento);
+// const b = new parDeBarreiras(700, 200, 800);
+// document.querySelector("[tp-flappy]").appendChild(b.elemento);
+
+function Barreiras(altura, largura, abertura, espaco, notificarPonto) {
+  this.pares = [
+    new parDeBarreiras(altura, abertura, largura),
+    new parDeBarreiras(altura, abertura, largura + espaco),
+    new parDeBarreiras(altura, abertura, largura + espaco * 2),
+    new parDeBarreiras(altura, abertura, largura + espaco * 3),
+  ];
+
+  const deslocamento = 3;
+
+  this.animar = () => {
+    this.pares.forEach((par) => {
+      par.setPosicao(par.getPosicao() - deslocamento);
+
+      if (par.getPosicao() < par.getLargura()) {
+        par.setPosicao(par.getPosicao() + espaco * this.pares.length);
+        par.sortearAbertura();
+      }
+      const meio = largura / 2;
+      const cruzouOMeio =
+        par.getPosicao() + deslocamento >= meio && par.getPosicao() < meio;
+      if (cruzouOMeio) notificarPonto();
+    });
+  };
+}
+
+const barreiras = new Barreiras(700, 1200, 200, 400);
+
+const areaDoJogo = document.querySelector("[tp-flappy]");
+barreiras.pares.forEach((par) => areaDoJogo.appendChild(par.elemento));
+
+setInterval(() => {
+  barreiras.animar();
+}, 20);
