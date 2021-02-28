@@ -69,16 +69,45 @@ function Barreiras(altura, largura, abertura, espaco, notificarPonto) {
       const meio = largura / 2;
       const cruzouOMeio =
         par.getPosicao() + deslocamento >= meio && par.getPosicao() < meio;
-      if (cruzouOMeio) notificarPonto();
+      if (cruzouOMeio) { notificarPonto()};
     });
   };
 }
 
-const barreiras = new Barreiras(700, 1200, 200, 400);
+function Passaro(alturaDoJogo) {
+  let voando = false;
+  
+  this.elemento = novoElemento("img", "passaro");
+  this.elemento.src = "imagens/passaro.png";
 
+  this.getPosicao = () => parseInt(this.elemento.style.bottom.split("px")[0]);
+  this.setY = (y) => (this.elemento.style.buttom = `${y}px`);
+
+  window.onkeydown = (e) => (voando = true);
+  window.onkeyup = (e) => (voando = false);
+
+  this.animar = () => {
+    const novoY = this.getPosicao() + (voando ? 8 : -5);
+    const alturaMaxima = alturaDoJogo - this.elemento.clientWidth;
+
+    if (novoY <= 0) {
+      this.setY(0);
+    } else if (novoY >= alturaMaxima) {
+      this.setY(alturaMaxima);
+    } else {
+      this.setY(novoY);
+    }
+  };
+  this.setY(alturaDoJogo / 2);
+}
+
+const barreiras = new Barreiras(700, 1200, 200, 400);
+const passaro = new Passaro(700);
 const areaDoJogo = document.querySelector("[tp-flappy]");
+areaDoJogo.appendChild(passaro.elemento);
 barreiras.pares.forEach((par) => areaDoJogo.appendChild(par.elemento));
 
 setInterval(() => {
   barreiras.animar();
+  passaro.animar();
 }, 20);
